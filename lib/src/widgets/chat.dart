@@ -90,12 +90,21 @@ class _ChatState extends State<Chat> {
   }
 
   void scrollToBottom() {
-    scrollController.animateTo(
-      scrollController.position.maxScrollExtent,
-      duration: Duration(seconds: 1),
-      curve: Curves.fastOutSlowIn,
-    );
+  if (!scrollController.hasClients) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom());
+    return;
   }
+  final position = scrollController.position;
+  if (!position.hasContentDimensions) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom());
+    return;
+  }
+  scrollController.animateTo(
+    position.maxScrollExtent,
+    duration: const Duration(milliseconds: 250),
+    curve: Curves.easeOut,
+  );
+}
 
   void _onScroll() {
     if (scrollController.position.pixels <= 50) {
